@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadoop Ecosystem — Lecture Guide</title>
+<style>
+  :root {
+    --srh-orange: #c8390a;
+    --srh-orange-light: #fff0eb;
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --surface2: #f1f3f5;
+    --border: #dee2e6;
+    --text: #212529;
+    --muted: #6c757d;
+    --green: #0d7a4e;
+    --green-bg: #e6f4ee;
+    --yellow: #856404;
+    --yellow-bg: #fff8e1;
+    --blue: #1557a0;
+    --blue-bg: #e8f0fb;
+    --purple: #5a3d99;
+    --purple-bg: #f0eaf8;
+    --teal: #0d6b6b;
+    --teal-bg: #e4f5f5;
+    --red: #b91c1c;
+    --red-bg: #fef2f2;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    scroll-behavior: smooth;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #fff7f4 0%, #fdeee8 100%);
+    border-bottom: 4px solid var(--srh-orange);
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+  }
+  .hero h1 { font-size: 2.4rem; color: var(--srh-orange); letter-spacing: -0.5px; }
+  .hero .subtitle { color: var(--muted); margin-top: .4rem; font-size: 1rem; }
+  .badge-row { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+  .badge {
+    background: var(--srh-orange-light); border: 1.5px solid var(--srh-orange);
+    color: var(--srh-orange); border-radius: 20px; padding: .25rem .9rem;
+    font-size: .78rem; font-weight: 700;
+  }
+
+  /* ── LAYOUT ── */
+  .wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+
+  nav.sidebar {
+    width: 230px; min-width: 230px; padding: 1.5rem .9rem;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    background: var(--surface); border-right: 1px solid var(--border);
+  }
+  nav.sidebar h3 {
+    font-size: .68rem; letter-spacing: 2px; color: var(--muted);
+    text-transform: uppercase; margin-bottom: .7rem; padding-left: .5rem;
+  }
+  nav.sidebar a {
+    display: block; padding: .38rem .6rem; border-radius: 6px;
+    color: var(--muted); text-decoration: none; font-size: .83rem;
+    transition: all .15s;
+  }
+  nav.sidebar a:hover, nav.sidebar a.active {
+    background: var(--srh-orange-light); color: var(--srh-orange); font-weight: 600;
+  }
+  nav.sidebar .nav-section { margin-top: 1rem; }
+
+  main { flex: 1; padding: 2rem 2.5rem; max-width: 1120px; }
+
+  /* ── SECTION HEADERS ── */
+  .section-title {
+    font-size: 1.45rem; color: var(--srh-orange);
+    border-bottom: 2px solid #f0cfc4;
+    padding-bottom: .5rem; margin: 2.8rem 0 1.2rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .section-title .icon { font-size: 1.25rem; }
+
+  /* ── TERM CARDS ── */
+  .term-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+
+  .term-card {
+    background: var(--surface); border-radius: 10px;
+    border: 1px solid var(--border); border-left: 4px solid var(--srh-orange);
+    padding: 1rem 1.2rem; transition: box-shadow .2s;
+  }
+  .term-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,.09); }
+  .term-card.green  { border-left-color: var(--green);  background: var(--green-bg); }
+  .term-card.blue   { border-left-color: var(--blue);   background: var(--blue-bg); }
+  .term-card.purple { border-left-color: var(--purple); background: var(--purple-bg); }
+  .term-card.teal   { border-left-color: var(--teal);   background: var(--teal-bg); }
+  .term-card.yellow { border-left-color: var(--yellow); background: var(--yellow-bg); }
+  .term-card.red    { border-left-color: var(--red);    background: var(--red-bg); }
+
+  .term-card .term-name { font-size: 1rem; font-weight: 700; margin-bottom: .3rem; color: var(--text); }
+  .term-card .term-tag  { font-size: .68rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
+  .term-card p  { font-size: .87rem; color: #444; }
+  .term-card ul { font-size: .85rem; color: #444; padding-left: 1.2rem; margin-top: .4rem; }
+  .term-card li { margin-bottom: .25rem; }
+
+  /* ── SLIDE BOXES ── */
+  .slide-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.6rem 1.8rem; margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+  .slide-box .slide-num {
+    display: inline-block; background: var(--srh-orange);
+    color: #fff; border-radius: 6px; padding: .2rem .75rem;
+    font-size: .78rem; font-weight: 700; margin-bottom: .8rem;
+  }
+  .slide-box h3 { font-size: 1.15rem; margin-bottom: .8rem; color: var(--text); }
+  .slide-box p  { font-size: .9rem; color: #444; margin-bottom: .6rem; }
+  .slide-box .talking-points { margin-top: 1rem; }
+  .slide-box .talking-points h4 {
+    font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--srh-orange); margin-bottom: .6rem; font-weight: 700;
+  }
+  .slide-box .talking-points li { font-size: .88rem; color: #444; margin-bottom: .45rem; }
+
+  .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: .8rem; margin-top: .8rem; }
+  .tool-item { background: var(--surface2); border-radius: 8px; padding: .75rem 1rem; border-left: 3px solid var(--blue); }
+  .tool-item.storage  { border-left-color: var(--teal); }
+  .tool-item.process  { border-left-color: var(--srh-orange); }
+  .tool-item.sql      { border-left-color: var(--yellow); }
+  .tool-item.ingest   { border-left-color: var(--green); }
+  .tool-item.ml       { border-left-color: var(--purple); }
+  .tool-item.coord    { border-left-color: var(--red); }
+  .tool-item.mgmt     { border-left-color: var(--muted); }
+  .tool-item strong { color: var(--text); font-size: .88rem; }
+  .tool-item span   { font-size: .78rem; color: #555; display: block; margin-top: .25rem; line-height: 1.5; }
+
+  /* ── COMPARE TABLE ── */
+  .compare-wrapper { overflow-x: auto; margin: 1rem 0; border-radius: 10px; border: 1px solid var(--border); }
+  table.compare { width: 100%; border-collapse: collapse; font-size: .87rem; }
+  table.compare th {
+    padding: .9rem 1rem; text-align: left; background: #fff4f0;
+    color: var(--srh-orange); border-bottom: 2px solid #f0cfc4; font-weight: 700;
+  }
+  table.compare td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); color: #333; vertical-align: top; }
+  table.compare tr:last-child td { border-bottom: none; }
+  table.compare tr:nth-child(even) td { background: #fafafa; }
+  table.compare .win  { color: var(--green); font-weight: 600; }
+  table.compare .lose { color: var(--red); }
+  table.compare .dim  { color: var(--muted); font-style: italic; }
+
+  .verdict-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.2rem; }
+  .verdict-card { border-radius: 10px; padding: 1.2rem 1.4rem; }
+  .verdict-card.mapred { background: var(--blue-bg);  border: 1.5px solid #90b8e8; }
+  .verdict-card.spark  { background: var(--srh-orange-light); border: 1.5px solid #f0a88a; }
+  .verdict-card h4 { font-size: .95rem; margin-bottom: .6rem; font-weight: 700; }
+  .verdict-card.mapred h4 { color: var(--blue); }
+  .verdict-card.spark  h4 { color: var(--srh-orange); }
+  .verdict-card ul { padding-left: 1.1rem; }
+  .verdict-card li { font-size: .85rem; color: #444; margin-bottom: .3rem; }
+
+  /* ── CALLOUTS ── */
+  .callout { border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; font-size: .88rem; }
+  .callout.tip  { background: var(--green-bg);  border-left: 4px solid var(--green); }
+  .callout.warn { background: var(--yellow-bg); border-left: 4px solid var(--yellow); }
+  .callout.info { background: var(--blue-bg);   border-left: 4px solid var(--blue); }
+  .callout strong { color: var(--text); }
+  .callout p { margin-top: .4rem; color: #444; }
+
+  /* ── ARCHITECTURE DIAGRAMS ── */
+  .diagram-container {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.6rem 1.8rem; margin: 1rem 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+  .diagram-container h3 {
+    font-size: 1.1rem; color: var(--text); margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .diagram-container h3 .diag-badge {
+    background: var(--srh-orange); color: #fff;
+    font-size: .7rem; border-radius: 5px; padding: .15rem .6rem; font-weight: 700;
+  }
+
+  /* Hadoop Architecture Diagram */
+  .ha-diagram { font-size: .82rem; }
+  .ha-layer {
+    border-radius: 8px; padding: .6rem 1rem; text-align: center;
+    margin-bottom: .4rem; border: 1.5px solid;
+  }
+  .ha-layer-label {
+    font-size: .65rem; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); text-align: left; margin: .6rem 0 .3rem; font-weight: 600;
+  }
+  .ha-apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-bottom: .4rem; }
+  .ha-app {
+    border-radius: 7px; padding: .55rem .5rem; text-align: center;
+    border: 1.5px solid; font-weight: 600; font-size: .8rem;
+  }
+  .ha-app .sub { font-size: .68rem; font-weight: 400; color: #666; display: block; margin-top: .15rem; }
+  .ha-app.batch  { background: #fff3cd; border-color: #d4a017; color: #7a5c00; }
+  .ha-app.memory { background: #fff0eb; border-color: #c8390a; color: #8c2200; }
+  .ha-app.stream { background: #e4f5f5; border-color: #0d6b6b; color: #0a4a4a; }
+  .ha-app.sql    { background: #e8f0fb; border-color: #1557a0; color: #0a3a70; }
+  .ha-yarn {
+    background: #e8f0fb; border: 2px solid #1557a0; border-radius: 8px;
+    padding: .7rem 1rem; text-align: center; margin-bottom: .4rem;
+  }
+  .ha-yarn .title { font-weight: 700; color: var(--blue); font-size: .9rem; }
+  .ha-yarn .sub   { font-size: .75rem; color: #555; }
+  .ha-hdfs {
+    background: var(--teal-bg); border: 2px solid var(--teal);
+    border-radius: 8px; padding: .7rem 1rem; text-align: center; margin-bottom: .4rem;
+  }
+  .ha-hdfs .title { font-weight: 700; color: var(--teal); font-size: .9rem; }
+  .ha-hdfs .sub   { font-size: .75rem; color: #555; }
+  .ha-nodes {
+    display: flex; gap: .4rem; justify-content: center; flex-wrap: wrap;
+    padding: .6rem; background: var(--surface2); border-radius: 8px;
+    border: 1px dashed var(--border);
+  }
+  .ha-node-box {
+    width: 52px; height: 44px; background: #d1d5db; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .6rem; color: #555; text-align: center; border: 1px solid #aaa;
+  }
+  .ha-arrow { text-align: center; color: var(--srh-orange); font-size: 1.1rem; margin: .2rem 0; }
+
+  /* Cluster Architecture Diagram */
+  .cluster-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .cluster-section-title {
+    font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); font-weight: 700; margin-bottom: .7rem;
+  }
+  .cluster-nodes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .cnode {
+    border-radius: 9px; border: 1.5px solid; padding: .7rem .8rem;
+    background: var(--surface);
+  }
+  .cnode.master { border-color: #1557a0; background: var(--blue-bg); }
+  .cnode.worker { border-color: #0d6b6b; background: var(--teal-bg); }
+  .cnode .cnode-title { font-size: .7rem; letter-spacing: 1px; text-transform: uppercase;
+    font-weight: 700; margin-bottom: .5rem; }
+  .cnode.master .cnode-title { color: var(--blue); }
+  .cnode.worker .cnode-title { color: var(--teal); }
+  .cnode-services { display: flex; flex-direction: column; gap: .3rem; }
+  .service-chip {
+    border-radius: 5px; padding: .3rem .6rem; font-size: .75rem;
+    font-weight: 600; text-align: center;
+  }
+  .chip-rm   { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .chip-jh   { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+  .chip-nn   { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .chip-snn  { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .chip-dn   { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .chip-hdfs { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+  .chip-nm   { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .chip-am   { background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4; }
+
+  .cluster-legend { margin-top: 1rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: .4rem; font-size: .8rem; color: #555; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+  /* YARN Architecture Diagram */
+  .yarn-diagram { display: flex; flex-direction: column; gap: .5rem; }
+  .yarn-row { display: flex; align-items: center; gap: .8rem; }
+  .yarn-client {
+    background: #f1f3f5; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: .6rem .9rem; font-size: .8rem; font-weight: 600; color: #333;
+    min-width: 70px; text-align: center;
+  }
+  .yarn-rm {
+    background: var(--blue-bg); border: 2px solid var(--blue);
+    border-radius: 8px; padding: .9rem 1.2rem; text-align: center; min-width: 160px;
+  }
+  .yarn-rm .rm-title { font-weight: 700; color: var(--blue); font-size: .9rem; }
+  .yarn-rm .rm-sub   { font-size: .72rem; color: #555; margin-top: .2rem; }
+  .yarn-nm-col { display: flex; flex-direction: column; gap: .5rem; flex: 1; }
+  .yarn-nm {
+    background: var(--teal-bg); border: 1.5px solid var(--teal);
+    border-radius: 8px; padding: .6rem .9rem;
+  }
+  .yarn-nm .nm-title { font-weight: 700; color: var(--teal); font-size: .82rem; }
+  .yarn-nm .nm-containers { display: flex; gap: .4rem; margin-top: .4rem; flex-wrap: wrap; }
+  .yarn-container {
+    background: #fff; border: 1px solid #aaa; border-radius: 5px;
+    padding: .25rem .5rem; font-size: .7rem; color: #444;
+  }
+  .yarn-container.appmaster { background: #fce7f3; border-color: #f9a8d4; color: #9d174d; font-weight: 600; }
+  .yarn-arrow { color: var(--srh-orange); font-size: 1.1rem; flex-shrink: 0; }
+  .yarn-vdash { display: flex; justify-content: center; align-items: center;
+    padding: .2rem 0; color: var(--muted); font-size: .9rem; }
+
+  .yarn-legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 1rem; }
+  .yarn-legend .legend-item { font-size: .78rem; color: #555; display: flex; align-items: center; gap: .4rem; }
+  .legend-box { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ── ARCH FLOW ── */
+  .arch-flow { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: .5rem 0 1rem; }
+  .arch-node {
+    background: var(--surface2); border-radius: 8px; padding: .8rem .9rem;
+    min-width: 130px; text-align: center; font-size: .78rem;
+    border: 1px solid var(--border); flex-shrink: 0;
+  }
+  .arch-node .node-title { font-weight: 700; color: var(--text); margin-bottom: .3rem; font-size: .83rem; }
+  .arch-node .node-items { color: var(--muted); font-size: .73rem; line-height: 1.5; }
+  .arch-arrow { display: flex; align-items: center; color: var(--srh-orange); font-size: 1.3rem; padding: 0 .4rem; flex-shrink: 0; }
+
+  /* ── DATA LAKE / DWH SECTION ── */
+  .dl-dwh-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin: 1.2rem 0; }
+  .dl-panel {
+    border-radius: 12px; border: 2px solid; padding: 1.4rem 1.5rem;
+  }
+  .dl-panel.lake  { border-color: var(--teal);   background: var(--teal-bg); }
+  .dl-panel.dwh   { border-color: var(--blue);   background: var(--blue-bg); }
+  .dl-panel h3    { font-size: 1.1rem; font-weight: 700; margin-bottom: .3rem; }
+  .dl-panel.lake h3 { color: var(--teal); }
+  .dl-panel.dwh  h3 { color: var(--blue); }
+  .dl-panel .dl-tagline { font-size: .78rem; color: var(--muted); margin-bottom: .9rem; font-style: italic; }
+  .dl-panel p  { font-size: .86rem; color: #333; margin-bottom: .6rem; }
+  .dl-panel ul { font-size: .84rem; color: #333; padding-left: 1.2rem; margin-bottom: .6rem; }
+  .dl-panel li { margin-bottom: .3rem; }
+  .dl-panel .prop-row { display: flex; flex-direction: column; gap: .35rem; margin: .7rem 0; }
+  .dl-prop {
+    display: flex; align-items: baseline; gap: .5rem;
+    font-size: .82rem; padding: .3rem .5rem; border-radius: 5px;
+    background: rgba(255,255,255,.55);
+  }
+  .dl-prop .prop-k { font-weight: 700; color: #333; min-width: 110px; flex-shrink: 0; }
+  .dl-prop .prop-v { color: #555; }
+
+  .example-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: .75rem; margin-top: .8rem; }
+  .example-card {
+    background: #fff; border-radius: 9px; border: 1px solid var(--border);
+    padding: .85rem 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .example-card .ex-company { font-weight: 700; font-size: .9rem; color: var(--text); display: flex; align-items: center; gap: .4rem; }
+  .example-card .ex-company .ex-logo { font-size: 1.1rem; }
+  .example-card .ex-product { font-size: .75rem; color: var(--srh-orange); font-weight: 600; margin: .25rem 0 .4rem; }
+  .example-card .ex-desc { font-size: .78rem; color: #555; line-height: 1.5; }
+
+  .diff-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); margin: 1.2rem 0; }
+  table.diff-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  table.diff-table th {
+    padding: .75rem 1rem; background: var(--surface2); color: var(--muted);
+    font-size: .7rem; letter-spacing: 1px; text-transform: uppercase;
+    border-bottom: 2px solid var(--border); text-align: left;
+  }
+  table.diff-table th:first-child { background: #fff; }
+  table.diff-table th.lake-th { background: var(--teal-bg); color: var(--teal); }
+  table.diff-table th.dwh-th  { background: var(--blue-bg); color: var(--blue); }
+  table.diff-table td { padding: .65rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; color: #333; }
+  table.diff-table tr:last-child td { border-bottom: none; }
+  table.diff-table td:first-child { font-weight: 600; color: var(--text); background: #fafafa; white-space: nowrap; }
+  table.diff-table tr:nth-child(even) td:not(:first-child) { background: rgba(0,0,0,.015); }
+
+  /* ── INTERACTIVE DIAGRAM ADDITIONS ── */
+
+  /* Shared control bar */
+  .diag-controls { display:flex; gap:.6rem; align-items:center; margin-top:1rem; flex-wrap:wrap; }
+  .diag-btn {
+    padding:.4rem 1rem; border-radius:6px;
+    border:1.5px solid var(--srh-orange); background:var(--srh-orange);
+    color:#fff; font-size:.82rem; font-weight:600; cursor:pointer; transition:all .15s;
+  }
+  .diag-btn:hover { background:#a82d08; border-color:#a82d08; }
+  .diag-btn.sec { background:#fff; color:var(--srh-orange); }
+  .diag-btn.sec:hover { background:var(--srh-orange-light); }
+  .diag-btn:disabled { opacity:.4; cursor:not-allowed; }
+  .diag-hint { font-size:.78rem; color:var(--muted); font-style:italic; margin-left:.2rem; }
+
+  /* Diagram 1 — Hadoop Architecture flow */
+  .ha-flow-wrap { display:flex; flex-direction:column; align-items:center; margin:.15rem 0; }
+  .ha-flow-track { width:2px; height:22px; background:rgba(200,57,10,.25); position:relative; overflow:visible; }
+  .ha-pulse-dot {
+    position:absolute; left:50%; transform:translateX(-50%);
+    width:10px; height:10px; border-radius:50%;
+    background:var(--srh-orange); top:-5px; opacity:0; pointer-events:none;
+  }
+  .ha-pulse-dot.running { animation:haPulseDown 1.4s ease-in infinite; }
+  @keyframes haPulseDown {
+    0%   { top:-5px; opacity:0; }
+    15%  { opacity:1; }
+    85%  { opacity:1; }
+    100% { top:25px; opacity:0; }
+  }
+  .ha-flow-icon { color:var(--srh-orange); font-size:1.1rem; }
+  .ha-flow-label { font-size:.62rem; color:var(--muted); letter-spacing:.5px; text-align:center; margin-bottom:.1rem; }
+
+  .ha-app.ha-clickable { cursor:pointer; transition:transform .15s, box-shadow .15s; }
+  .ha-app.ha-clickable:hover { transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.12); }
+  .ha-app.ha-active { box-shadow:0 0 0 3px var(--srh-orange) !important; transform:scale(1.04); }
+
+  .ha-flow-layer { transition:box-shadow .3s; }
+  .ha-flow-layer.ha-active { box-shadow:0 0 0 3px var(--srh-orange); animation:layerGlow .5s ease-out; }
+  @keyframes layerGlow {
+    0% { box-shadow:0 0 0 0 rgba(200,57,10,.6); }
+    100% { box-shadow:0 0 0 3px var(--srh-orange); }
+  }
+  .ha-nodes.ha-active .ha-node-box { background:#ffd8cc; border-color:var(--srh-orange); animation:nodeBounce .4s ease-out; }
+  @keyframes nodeBounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+
+  /* Diagram 2 — Cluster tooltips */
+  .has-tt { position:relative; cursor:help; }
+  .tt {
+    display:none; position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%);
+    background:#1a1a2e; color:#fff; font-size:.71rem; line-height:1.5;
+    padding:.45rem .75rem; border-radius:7px; white-space:normal; min-width:160px;
+    max-width:220px; text-align:center; z-index:200; pointer-events:none;
+    box-shadow:0 4px 12px rgba(0,0,0,.2); font-weight:400;
+  }
+  .tt::after {
+    content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+    border:5px solid transparent; border-top-color:#1a1a2e;
+  }
+  .has-tt:hover .tt { display:block; }
+
+  /* Cluster node path highlights */
+  .cnode.path-on { box-shadow:0 0 0 3px #c8390a; transition:box-shadow .3s; }
+  .service-chip.path-on {
+    background:var(--srh-orange-light) !important;
+    border-color:var(--srh-orange) !important;
+    color:var(--srh-orange) !important;
+    font-weight:700 !important;
+    transition:all .3s;
+  }
+  /* Heartbeat indicator dot */
+  .hb-dot {
+    display:inline-block; width:7px; height:7px;
+    background:#22c55e; border-radius:50%; margin-left:5px; vertical-align:middle;
+    animation:hbPulse 2s ease-in-out infinite;
+  }
+  .hb-dot.d1{animation-delay:.4s} .hb-dot.d2{animation-delay:.8s} .hb-dot.d3{animation-delay:1.2s}
+  @keyframes hbPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.2;transform:scale(.5)} }
+
+  /* Diagram 3 — YARN step walkthrough */
+  .yarn-step-cols { display:grid; grid-template-columns:auto auto 1fr; gap:1.2rem; align-items:start; }
+  .yarn-col-label { font-size:.63rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:.5rem; }
+  .yarn-el { transition:box-shadow .3s, opacity .3s; }
+  .yarn-el.ys-active { box-shadow:0 0 0 3px #c8390a !important; }
+  .yarn-el.ys-dim { opacity:.28; }
+
+  .yarn-progress { display:flex; gap:.3rem; margin:.8rem 0 .4rem; }
+  .yarn-ps { height:5px; flex:1; background:var(--border); border-radius:4px; transition:background .3s; }
+  .yarn-ps.done { background:#0d7a4e; }
+  .yarn-ps.active { background:var(--srh-orange); }
+
+  .yarn-step-info {
+    background:var(--surface2); border-radius:9px; padding:.9rem 1.1rem;
+    margin-top:.8rem; font-size:.88rem; color:#333;
+    border-left:4px solid var(--srh-orange); min-height:62px;
+  }
+  .yarn-step-info .ys-label {
+    font-size:.68rem; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--srh-orange); font-weight:700; margin-bottom:.35rem;
+  }
+
+  /* ── HANDS-ON LAB ── */
+  .cmd-block { background:#1a1a2e; color:#e0e0e0; border-radius:8px; padding:1rem 1.4rem; font-family:'Courier New',monospace; font-size:.88rem; margin:.5rem 0 1rem; overflow-x:auto; line-height:1.7; }
+  .cmd-block .cm { color:#6a737d; }
+  .step-row { display:flex; gap:.9rem; align-items:flex-start; margin:.9rem 0; }
+  .step-num { flex-shrink:0; background:var(--srh-orange); color:#fff; font-weight:700; border-radius:50%; width:1.8rem; height:1.8rem; line-height:1.8rem; text-align:center; font-size:.82rem; }
+  .step-body { flex:1; }
+  .step-title { font-weight:600; font-size:.95rem; color:var(--text); margin-bottom:.3rem; }
+  .step-desc { font-size:.86rem; color:#555; margin-bottom:.4rem; }
+
+  /* ── FOOTER ── */
+  footer { text-align: center; padding: 1.5rem; color: var(--muted); font-size: .8rem; border-top: 1px solid var(--border); background: var(--surface); margin-top: 2rem; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #aaa; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Hadoop Ecosystem</h1>
+  <div class="subtitle">Data Engineering 1 &nbsp;·&nbsp; SRH Hochschule Heidelberg</div>
+  <div class="badge-row">
+    <span class="badge">Architecture Diagrams</span>
+    <span class="badge">Slide 16 Deep Dive</span>
+    <span class="badge">Slide 17 Deep Dive</span>
+    <span class="badge">MapReduce vs Spark</span>
+    <span class="badge">30+ Key Terms</span>
+  </div>
+</div>
+
+<div class="wrapper">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="nav-section">
+    <h3>Contents</h3>
+    <a href="#foundations">Foundations</a>
+    <a href="#arch-diagrams">Architecture Diagrams</a>
+    <a href="#hdfs">HDFS Concepts</a>
+    <a href="#yarn">YARN &amp; Scheduling</a>
+    <a href="#processing">Data Processing</a>
+    <a href="#slide16">Slide 16 — Tools</a>
+    <a href="#slide17">Slide 17 — Enterprise Arch</a>
+    <a href="#comparison">MapReduce vs Spark</a>
+    <a href="#datalake-dwh">Data Lake vs Data Warehouse</a>
+    <a href="#glossary">Quick Glossary</a>
+    <a href="#hands-on-lab">Hands-On Lab</a>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main>
+
+<!-- ══════════════════════════════════════
+     SECTION 1 — FOUNDATIONS
+══════════════════════════════════════ -->
+<h2 class="section-title" id="foundations"><span class="icon">🏗</span> Foundations</h2>
+
+<div class="term-grid">
+
+  <div class="term-card">
+    <div class="term-tag">Core Concept</div>
+    <div class="term-name">Scalability</div>
+    <p>The ability of a data system to handle growing load — more data, more requests — by adding resources. A system is scalable when adding hardware linearly increases throughput.</p>
+    <ul>
+      <li><strong>Vertical (Scale Up):</strong> Replace a machine with a more powerful one. Simpler to program, but expensive with a hardware ceiling.</li>
+      <li><strong>Horizontal (Scale Out):</strong> Add more machines to share the load. Cheaper hardware, but requires distributed programming.</li>
+    </ul>
+  </div>
+
+  <div class="term-card green">
+    <div class="term-tag">Core Concept</div>
+    <div class="term-name">Fault Tolerance</div>
+    <p>The ability of a system to keep operating correctly even when individual components fail. Hadoop achieves this at the <em>software layer</em> — it assumes commodity hardware will fail and handles it gracefully.</p>
+    <ul>
+      <li>Failed tasks are automatically retried on another node.</li>
+      <li>Data is replicated across nodes and racks, so a disk or node failure causes no data loss.</li>
+      <li>This allows use of cheaper, less reliable hardware — a core economic advantage.</li>
+    </ul>
+  </div>
+
+  <div class="term-card blue">
+    <div class="term-tag">Platform</div>
+    <div class="term-name">Apache Hadoop</div>
+    <p>An open-source, Java-based, distributed computing platform born from the need to scale search indices (originally at Yahoo, inspired by Google's GFS and MapReduce papers).</p>
+    <ul>
+      <li>Originally built to index billions of web pages for the Apache Nutch project.</li>
+      <li>Two primary components: <strong>HDFS</strong> (storage) and <strong>YARN</strong> (resource management).</li>
+      <li>Now forms the blueprint for modern cloud data lakes (Azure ADLS, Amazon S3, GCS).</li>
+    </ul>
+  </div>
+
+  <div class="term-card yellow">
+    <div class="term-tag">Architecture</div>
+    <div class="term-name">Hadoop Cluster</div>
+    <p>A cluster is a group of machines (nodes) working together. Hadoop clusters have two roles:</p>
+    <ul>
+      <li><strong>Master Nodes (3–6):</strong> Run coordination services — NameNode, ResourceManager, JobHistory Server. Clients contact master nodes to submit jobs.</li>
+      <li><strong>Worker Nodes (majority):</strong> Where data is stored (DataNode) and computation runs (NodeManager). Can number in the hundreds or thousands.</li>
+    </ul>
+  </div>
+
+  <div class="term-card purple">
+    <div class="term-tag">History</div>
+    <div class="term-name">Google's Founding Papers</div>
+    <p>Two Google papers were the blueprints for Hadoop:</p>
+    <ul>
+      <li><strong>GFS (2003):</strong> Google File System — described how to build a reliable distributed file system on cheap commodity hardware. Inspired HDFS.</li>
+      <li><strong>MapReduce (2004):</strong> Described a programming model that breaks any problem into two functions — map and reduce — executable in parallel across thousands of machines.</li>
+    </ul>
+  </div>
+
+  <div class="term-card teal">
+    <div class="term-tag">Key Concept</div>
+    <div class="term-name">Data Locality</div>
+    <p>Moving computation <em>to the data</em> rather than moving data to the computation. Since network bandwidth is the bottleneck in a cluster, Hadoop schedules tasks to run on the same node (or at least rack) where the data lives.</p>
+    <p style="margin-top:.4rem"><em>"It is cheaper to move a function than to move a terabyte."</em></p>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 2 — ARCHITECTURE DIAGRAMS
+══════════════════════════════════════ -->
+<h2 class="section-title" id="arch-diagrams"><span class="icon">📐</span> Architecture Diagrams</h2>
+
+<!-- ── DIAGRAM 1: HADOOP ARCHITECTURE ── -->
+<div class="diagram-container">
+  <h3><span class="diag-badge">SLIDE 8</span>&nbsp; Hadoop Architecture — Layered View</h3>
+
+  <div class="ha-diagram">
+    <div class="ha-layer-label">▶ Processing Frameworks — <em>click any box to trace its data flow</em></div>
+    <div class="ha-apps">
+      <div class="ha-app batch ha-clickable" onclick="haHighlight('batch','MapReduce')">
+        MapReduce <span class="sub">Batch Processing</span>
+      </div>
+      <div class="ha-app memory ha-clickable" onclick="haHighlight('spark','Spark')">
+        Spark <span class="sub">In-Memory</span>
+      </div>
+      <div class="ha-app stream ha-clickable" onclick="haHighlight('storm','Storm')">
+        Storm <span class="sub">Streaming</span>
+      </div>
+      <div class="ha-app sql ha-clickable" onclick="haHighlight('hive','Hive')">
+        Hive <span class="sub">SQL Queries</span>
+      </div>
+    </div>
+
+    <!-- Flow arrow 1 -->
+    <div class="ha-flow-wrap">
+      <div class="ha-flow-label">resource requests &amp; task scheduling</div>
+      <div class="ha-flow-track"><div class="ha-pulse-dot" id="ha-p1"></div></div>
+      <div class="ha-flow-icon">▼</div>
+    </div>
+
+    <div class="ha-yarn ha-flow-layer" id="ha-yarn">
+      <div class="title">YARN — Yet Another Resource Negotiator</div>
+      <div class="sub">Cluster Resource Manager &amp; Job Scheduler · Allocates CPU + Memory containers</div>
+    </div>
+
+    <!-- Flow arrow 2 -->
+    <div class="ha-flow-wrap">
+      <div class="ha-flow-label">block locations &amp; data locality</div>
+      <div class="ha-flow-track"><div class="ha-pulse-dot" id="ha-p2"></div></div>
+      <div class="ha-flow-icon">▼</div>
+    </div>
+
+    <div class="ha-hdfs ha-flow-layer" id="ha-hdfs">
+      <div class="title">HDFS — Hadoop Distributed File System</div>
+      <div class="sub">Distributed storage · 128 MB blocks · 3× replication across nodes &amp; racks</div>
+    </div>
+
+    <!-- Flow arrow 3 -->
+    <div class="ha-flow-wrap">
+      <div class="ha-flow-label">physical read / write to disk</div>
+      <div class="ha-flow-track"><div class="ha-pulse-dot" id="ha-p3"></div></div>
+      <div class="ha-flow-icon">▼</div>
+    </div>
+
+    <div class="ha-nodes" id="ha-nodes">
+      <div class="ha-node-box">Node<br>1</div>
+      <div class="ha-node-box">Node<br>2</div>
+      <div class="ha-node-box">Node<br>3</div>
+      <div class="ha-node-box">Node<br>4</div>
+      <div class="ha-node-box">Node<br>5</div>
+      <div class="ha-node-box">Node<br>6</div>
+      <div class="ha-node-box" style="background:#eee;color:#aaa">···</div>
+    </div>
+    <div style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:.4rem">Commodity hardware — cheap, replaceable servers</div>
+  </div>
+
+  <div class="diag-controls">
+    <button class="diag-btn" onclick="haPlayAll()">▶ Animate Flow</button>
+    <button class="diag-btn sec" onclick="haReset()">↺ Reset</button>
+    <span class="diag-hint" id="ha-hint">Click an app above to trace its path through the stack</span>
+  </div>
+
+  <div class="callout info" style="margin-top:1rem">
+    <strong>Key Teaching Point:</strong> Every processing framework — MapReduce, Spark, Storm, Hive — sits on top of the <em>same</em> YARN and HDFS. They share resources and storage. YARN knows which node holds which HDFS block and launches tasks there — this is <strong>data locality</strong> avoiding terabytes of network transfer.
+  </div>
+</div>
+
+<!-- ── DIAGRAM 2: HADOOP CLUSTER ARCHITECTURE ── -->
+<div class="diagram-container">
+  <h3><span class="diag-badge">SLIDE 10</span>&nbsp; Hadoop Cluster Architecture — Node Roles</h3>
+  <div style="font-size:.78rem;color:var(--muted);margin-bottom:.9rem">Hover any service chip for a description · Use buttons to animate data paths</div>
+
+  <div class="cluster-grid">
+
+    <!-- MASTER NODES -->
+    <div>
+      <div class="cluster-section-title">🔵 Master Nodes — Coordination</div>
+      <div class="cluster-nodes-grid">
+
+        <div class="cnode master" id="cl-master1">
+          <div class="cnode-title">Master Node 1<br><span style="font-weight:400;text-transform:none;font-size:.68rem">(YARN Master)</span></div>
+          <div class="cnode-services">
+            <div class="service-chip chip-rm has-tt" id="cl-rm">ResourceManager
+              <span class="tt">Global scheduler — tracks all cluster resources, accepts job submissions, assigns containers to NodeManagers.</span>
+            </div>
+            <div class="service-chip chip-jh has-tt" id="cl-jh">JobHistory Server
+              <span class="tt">Stores logs and metrics for completed MapReduce jobs. Accessible via web UI for debugging finished jobs.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cnode master" id="cl-master2">
+          <div class="cnode-title">Master Node 2<br><span style="font-weight:400;text-transform:none;font-size:.68rem">(HDFS Master)</span></div>
+          <div class="cnode-services">
+            <div class="service-chip chip-nn has-tt" id="cl-nn">NameNode
+              <span class="tt">HDFS brain — holds the entire file-system namespace and block location map in memory. Single point of metadata access.</span>
+            </div>
+            <div class="service-chip chip-snn has-tt" id="cl-snn">Secondary NameNode
+              <span class="tt">Periodically merges the NameNode's edit log with the fsimage to prevent unbounded log growth. NOT a hot standby.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div style="font-size:.78rem;color:#555;margin-top:.8rem;line-height:1.6;padding:.6rem;background:var(--blue-bg);border-radius:7px">
+        <strong>Master nodes coordinate but do not store data.</strong> In production, NameNode and ResourceManager each have a <em>Standby</em> node for HA.
+      </div>
+    </div>
+
+    <!-- WORKER NODES -->
+    <div>
+      <div class="cluster-section-title">🟢 Worker Nodes — Storage + Computation</div>
+      <div class="cluster-nodes-grid">
+
+        <div class="cnode worker" id="cl-wA">
+          <div class="cnode-title">Worker Node A</div>
+          <div class="cnode-services">
+            <div class="service-chip chip-dn has-tt" id="cl-dnA">DataNode
+              <span class="tt">Stores HDFS data blocks on the local disk and streams them to clients or other DataNodes on request.</span>
+            </div>
+            <div class="service-chip chip-hdfs has-tt" id="cl-blkA">HDFS Blocks
+              <span class="tt">128 MB chunks of a file stored locally. Replicated on 2 more nodes for fault tolerance (default RF=3).</span>
+            </div>
+            <div class="service-chip chip-nm has-tt" id="cl-nmA">NodeManager
+              <span class="tt">Launches and monitors containers (CPU+RAM slices) on this node. Reports resource usage to the ResourceManager.</span>
+            </div>
+            <div class="service-chip chip-am has-tt" id="cl-amA">AppMaster
+              <span class="tt">Per-job coordinator — negotiates containers from the RM and monitors all tasks for one application.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cnode worker" id="cl-wB">
+          <div class="cnode-title">Worker Node B</div>
+          <div class="cnode-services">
+            <div class="service-chip chip-dn has-tt" id="cl-dnB">DataNode
+              <span class="tt">Holds replica blocks for data stored on Node A and C — this is the second copy in the replication chain.</span>
+            </div>
+            <div class="service-chip chip-hdfs has-tt" id="cl-blkB">HDFS Blocks
+              <span class="tt">Replica blocks (copy 2 of 3). If Node A fails, reads can still be served from Node B or C.</span>
+            </div>
+            <div class="service-chip chip-nm has-tt" id="cl-nmB">NodeManager
+              <span class="tt">Manages containers on this node and sends heartbeats to the ResourceManager every 3 seconds.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cnode worker" id="cl-wC">
+          <div class="cnode-title">Worker Node C</div>
+          <div class="cnode-services">
+            <div class="service-chip chip-dn has-tt" id="cl-dnC">DataNode
+              <span class="tt">Holds the third replica, ideally on a different rack to protect against rack-level failure.</span>
+            </div>
+            <div class="service-chip chip-hdfs has-tt" id="cl-blkC">HDFS Blocks
+              <span class="tt">Copy 3 of 3 — stored on a different rack. Rack awareness ensures data survives switch/power failure.</span>
+            </div>
+            <div class="service-chip chip-nm has-tt" id="cl-nmC">NodeManager
+              <span class="tt">Sends heartbeats and resource reports to the ResourceManager, receives container launch commands.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cnode worker" style="display:flex;align-items:center;justify-content:center;border-style:dashed">
+          <div style="text-align:center;color:var(--muted);font-size:.8rem">Worker Node D<br>· · ·<br><span style="font-size:.7rem">(scales to 1000s)</span></div>
+        </div>
+
+      </div>
+      <div style="font-size:.78rem;color:#555;margin-top:.8rem;line-height:1.6;padding:.6rem;background:var(--teal-bg);border-radius:7px">
+        <strong>Data locality:</strong> NodeManager runs containers on the same node where DataNode holds the required blocks — avoids moving data over the network.
+      </div>
+    </div>
+
+  </div><!-- end cluster-grid -->
+
+  <!-- Interactive controls -->
+  <div class="diag-controls" style="margin-top:1rem">
+    <button class="diag-btn" onclick="clusterPath('write')">✍ HDFS Write Path</button>
+    <button class="diag-btn" onclick="clusterPath('read')">📖 HDFS Read Path</button>
+    <button class="diag-btn" onclick="clusterPath('hb')">💓 Heartbeats</button>
+    <button class="diag-btn sec" onclick="clusterReset()">↺ Reset</button>
+    <span class="diag-hint" id="cl-hint">Select a path to animate</span>
+  </div>
+
+  <div class="cluster-legend" style="margin-top:1rem">
+    <div class="legend-item"><div class="legend-dot" style="background:#dbeafe;border:1px solid #93c5fd"></div> ResourceManager</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ede9fe;border:1px solid #c4b5fd"></div> JobHistory Server</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d1fae5;border:1px solid #6ee7b7"></div> NameNode / DataNode</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#fef3c7;border:1px solid #fcd34d"></div> Secondary NameNode</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#fce7f3;border:1px solid #f9a8d4"></div> ApplicationMaster</div>
+  </div>
+</div>
+
+<!-- ── DIAGRAM 3: YARN ARCHITECTURE ── -->
+<div class="diagram-container">
+  <h3><span class="diag-badge">SLIDE 15</span>&nbsp; YARN Architecture — Step-by-Step Job Execution</h3>
+  <div style="font-size:.78rem;color:var(--muted);margin-bottom:.9rem">Use <strong>Next Step</strong> or <strong>Auto Play</strong> to walk through how YARN processes a submitted job</div>
+
+  <!-- Progress bar -->
+  <div class="yarn-progress" id="yarn-prog">
+    <div class="yarn-ps" id="yp0"></div><div class="yarn-ps" id="yp1"></div>
+    <div class="yarn-ps" id="yp2"></div><div class="yarn-ps" id="yp3"></div>
+    <div class="yarn-ps" id="yp4"></div><div class="yarn-ps" id="yp5"></div>
+    <div class="yarn-ps" id="yp6"></div>
+  </div>
+
+  <!-- 3-column diagram -->
+  <div class="yarn-step-cols">
+
+    <!-- Clients column -->
+    <div>
+      <div class="yarn-col-label">Clients</div>
+      <div style="display:flex;flex-direction:column;gap:.8rem;margin-top:.3rem">
+        <div class="yarn-client yarn-el" id="yc-c1">Client 1</div>
+        <div class="yarn-client yarn-el" id="yc-c2">Client 2</div>
+      </div>
+    </div>
+
+    <!-- ResourceManager column -->
+    <div>
+      <div class="yarn-col-label" style="text-align:center">ResourceManager</div>
+      <div style="margin-top:.3rem">
+        <div class="yarn-rm yarn-el" id="yc-rm">
+          <div class="rm-title">ResourceManager</div>
+          <div class="rm-sub">Global Scheduler<br>One per cluster<br>(on master node)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NodeManagers column -->
+    <div>
+      <div class="yarn-col-label">Worker Nodes — NodeManagers</div>
+      <div style="display:flex;flex-direction:column;gap:.6rem;margin-top:.3rem">
+
+        <div class="yarn-nm yarn-el" id="yc-nm1">
+          <div class="nm-title">NodeManager — Worker Node 1</div>
+          <div class="nm-containers">
+            <div class="yarn-container appmaster yarn-el" id="yc-am1">AppMaster<br>(App 1)</div>
+            <div class="yarn-container yarn-el" id="yc-con1a">Container</div>
+            <div class="yarn-container yarn-el" id="yc-con1b">Container</div>
+          </div>
+        </div>
+
+        <div class="yarn-nm yarn-el" id="yc-nm2">
+          <div class="nm-title">NodeManager — Worker Node 2</div>
+          <div class="nm-containers">
+            <div class="yarn-container appmaster yarn-el" id="yc-am2">AppMaster<br>(App 2)</div>
+            <div class="yarn-container yarn-el" id="yc-con2a">Container</div>
+          </div>
+        </div>
+
+        <div class="yarn-nm yarn-el" id="yc-nm3">
+          <div class="nm-title">NodeManager — Worker Node 3</div>
+          <div class="nm-containers">
+            <div class="yarn-container yarn-el" id="yc-con3a">Container</div>
+            <div class="yarn-container yarn-el" id="yc-con3b">Container</div>
+            <div class="yarn-container yarn-el" id="yc-con3c">Container</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- end yarn-step-cols -->
+
+  <!-- Step description box -->
+  <div class="yarn-step-info" id="yarn-info">
+    <div class="ys-label" id="yarn-info-label">Ready</div>
+    <div id="yarn-info-text">Click <strong>Next Step</strong> or <strong>Auto Play</strong> to walk through YARN's job execution flow — 7 steps in total.</div>
+  </div>
+
+  <!-- Controls -->
+  <div class="diag-controls" style="margin-top:.8rem">
+    <button class="diag-btn sec" onclick="yarnNav(-1)" id="yarn-prev" disabled>◀ Prev</button>
+    <button class="diag-btn" onclick="yarnNav(1)" id="yarn-next">Next Step ▶</button>
+    <button class="diag-btn sec" onclick="yarnAuto()" id="yarn-auto">⏵ Auto Play</button>
+    <button class="diag-btn sec" onclick="yarnReset()">↺ Reset</button>
+    <span class="diag-hint" id="yarn-counter">Step 0 / 7</span>
+  </div>
+
+  <div class="yarn-legend" style="margin-top:1rem">
+    <div class="legend-item"><div class="legend-box" style="background:#dbeafe;border:1px solid #93c5fd"></div> ResourceManager — global scheduler</div>
+    <div class="legend-item"><div class="legend-box" style="background:#fce7f3;border:1px solid #f9a8d4"></div> ApplicationMaster — per-job coordinator</div>
+    <div class="legend-item"><div class="legend-box" style="background:var(--teal-bg);border:1px solid var(--teal)"></div> NodeManager — per-worker node</div>
+    <div class="legend-item"><div class="legend-box" style="background:#fff;border:1px solid #aaa"></div> Container — CPU + RAM slice</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 3 — HDFS
+══════════════════════════════════════ -->
+<h2 class="section-title" id="hdfs"><span class="icon">💾</span> HDFS — Hadoop Distributed File System</h2>
+
+<div class="term-grid">
+
+  <div class="term-card">
+    <div class="term-tag">Storage Layer</div>
+    <div class="term-name">HDFS</div>
+    <p>The core distributed file system of Hadoop, designed as an open-source version of Google's GFS. Built on top of the local file systems of many ordinary nodes. Designed to hold <strong>petabytes</strong> of data.</p>
+    <ul>
+      <li>Data is split into <strong>blocks</strong> (default 128 MB) and distributed across DataNodes.</li>
+      <li>Each block is <strong>transparently replicated</strong> (default 3 copies) across different nodes and racks.</li>
+      <li>Provides high reliability and high aggregate bandwidth — ideal for scaling computation.</li>
+    </ul>
+  </div>
+
+  <div class="term-card green">
+    <div class="term-tag">HDFS Service — Master Node</div>
+    <div class="term-name">NameNode</div>
+    <p>The <em>directory service</em> of HDFS — runs on a master node. It stores metadata: the directory tree, file names, permissions, and <strong>which DataNodes hold which blocks</strong>. It does <em>not</em> store actual data.</p>
+    <ul>
+      <li>Acts like a "traffic cop" — clients ask the NameNode where data is, then connect directly to the DataNode.</li>
+      <li>The NameNode is a single point of failure — which is why Secondary/Standby NameNodes exist.</li>
+    </ul>
+  </div>
+
+  <div class="term-card yellow">
+    <div class="term-tag">HDFS Service — Master Node</div>
+    <div class="term-name">Secondary / Standby NameNode</div>
+    <p>Relieves the primary NameNode by periodically <em>checkpointing</em> — merging the edit log into the filesystem image so the NameNode doesn't have to replay the full edit history on restart.</p>
+    <p style="margin-top:.4rem"><strong>Important:</strong> The Secondary NameNode is <em>not</em> a live failover backup. The Standby NameNode (HA mode) provides true hot failover.</p>
+  </div>
+
+  <div class="term-card blue">
+    <div class="term-tag">HDFS Service — Worker Node</div>
+    <div class="term-name">DataNode</div>
+    <p>Worker nodes that physically store the HDFS data blocks on the local Linux filesystem. DataNodes continuously send <strong>heartbeat</strong> signals to the NameNode and report which blocks they hold. If a DataNode goes silent, the NameNode automatically re-replicates its blocks onto other nodes.</p>
+  </div>
+
+  <div class="term-card teal">
+    <div class="term-tag">HDFS Concept</div>
+    <div class="term-name">Block Replication &amp; Rack Awareness</div>
+    <p>HDFS places replicas across <strong>different racks</strong>, not just different nodes, to protect against rack/switch failures:</p>
+    <ul>
+      <li>Replica 1: Same node as the writer (or a close node).</li>
+      <li>Replica 2: Different rack.</li>
+      <li>Replica 3: Different node on the same rack as replica 2.</li>
+    </ul>
+  </div>
+
+  <div class="term-card red">
+    <div class="term-tag">HDFS Design Pattern</div>
+    <div class="term-name">Write-Once, Read-Many (WORM)</div>
+    <p>HDFS is optimised for large sequential reads, not random writes. Files are written once and then read many times. This simplifies consistency and is ideal for batch processing workloads like MapReduce.</p>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 4 — YARN
+══════════════════════════════════════ -->
+<h2 class="section-title" id="yarn"><span class="icon">⚙️</span> YARN — Resource Management</h2>
+
+<div class="term-grid">
+
+  <div class="term-card">
+    <div class="term-tag">Resource Management</div>
+    <div class="term-name">YARN (Yet Another Resource Negotiator)</div>
+    <p>Hadoop's cluster resource manager introduced in Hadoop 2.0. YARN decouples resource management from the data processing model — allowing <em>multiple engines</em> (MapReduce, Spark, Storm, Hive) to share the same cluster simultaneously.</p>
+    <ul>
+      <li>Partitions resources into <strong>containers</strong> (CPU core + memory allocation).</li>
+      <li>Monitors containers to ensure tasks don't exceed their memory/CPU quotas.</li>
+      <li>Provides <strong>data locality</strong> as a scheduling resource.</li>
+    </ul>
+  </div>
+
+  <div class="term-card green">
+    <div class="term-tag">YARN Service — Master Node</div>
+    <div class="term-name">ResourceManager</div>
+    <p>One per cluster, runs on a master node. The <em>global scheduler</em> — allocates cluster resources across all competing applications. Manages queues, user limits, and fairness policies. When a client submits a job, the ResourceManager creates an ApplicationMaster for it.</p>
+  </div>
+
+  <div class="term-card blue">
+    <div class="term-tag">YARN Service — Per Application</div>
+    <div class="term-name">ApplicationMaster</div>
+    <p>One per running application/job. Runs inside a container on a worker node. Responsible for:</p>
+    <ul>
+      <li>Breaking the job into tasks.</li>
+      <li>Negotiating with the ResourceManager for containers to run those tasks.</li>
+      <li>Tracking task progress and handling failures.</li>
+    </ul>
+  </div>
+
+  <div class="term-card purple">
+    <div class="term-tag">YARN Service — Worker Node</div>
+    <div class="term-name">NodeManager</div>
+    <p>One per worker node. Manages containers launched on its node — starts them, monitors their CPU/memory/disk usage, and kills them if they exceed quotas. Reports node health to the ResourceManager via heartbeats.</p>
+  </div>
+
+  <div class="term-card yellow">
+    <div class="term-tag">YARN Concept</div>
+    <div class="term-name">Container</div>
+    <p>YARN's atomic unit of resource allocation. A container = a slice of CPU + a slice of RAM on a specific worker node. Applications request containers; the ResourceManager grants them from the pool of available node resources.</p>
+  </div>
+
+  <div class="term-card teal">
+    <div class="term-tag">YARN Concept</div>
+    <div class="term-name">YARN Schedulers</div>
+    <p>YARN has a pluggable scheduler. Common options:</p>
+    <ul>
+      <li><strong>FIFO Scheduler:</strong> Simple queue, first in first out. Not suitable for multi-tenant clusters.</li>
+      <li><strong>Capacity Scheduler (default):</strong> Divides cluster into queues with reserved capacity for different teams.</li>
+      <li><strong>Fair Scheduler:</strong> Every job gets an equal share of resources over time.</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 5 — PROCESSING
+══════════════════════════════════════ -->
+<h2 class="section-title" id="processing"><span class="icon">⚡</span> Distributed Data Processing</h2>
+
+<div class="term-grid">
+
+  <div class="term-card">
+    <div class="term-tag">Processing Framework</div>
+    <div class="term-name">MapReduce — The Three Phases</div>
+    <p>The original Hadoop processing model, championed by Google. Decomposes any problem into three phases:</p>
+    <ul>
+      <li><strong>Map Phase:</strong> Read input splits in parallel across nodes. Each mapper transforms raw input records into <code>(key, value)</code> pairs.</li>
+      <li><strong>Shuffle &amp; Sort Phase:</strong> Automatically groups all values by key — all values with the same key go to the same reducer. The most network-intensive phase.</li>
+      <li><strong>Reduce Phase:</strong> Each reducer processes all values for one key and writes output back to HDFS.</li>
+    </ul>
+    <p style="margin-top:.4rem">Each phase writes results to <strong>disk</strong> — making it reliable but slow for iterative algorithms.</p>
+  </div>
+
+  <div class="term-card green">
+    <div class="term-tag">Processing Framework</div>
+    <div class="term-name">Apache Spark</div>
+    <p>A distributed, <strong>in-memory</strong> data processing engine. Instead of writing intermediate results to disk between stages, Spark keeps data in RAM (as RDDs or DataFrames). This makes it 10–100× faster than MapReduce for iterative and interactive workloads.</p>
+    <ul>
+      <li>Supports batch, streaming, SQL, ML, and graph processing in one engine.</li>
+      <li>APIs in Scala, Python (PySpark), Java, and R.</li>
+      <li>Runs on YARN, Kubernetes, or its own standalone cluster manager.</li>
+    </ul>
+  </div>
+
+  <div class="term-card blue">
+    <div class="term-tag">Spark Concept</div>
+    <div class="term-name">RDD — Resilient Distributed Dataset</div>
+    <p>Spark's fundamental data abstraction. An RDD is an <em>immutable, fault-tolerant collection</em> of records partitioned across cluster nodes. "Resilient" because Spark can rebuild lost partitions by replaying the lineage of transformations.</p>
+    <ul>
+      <li><strong>Transformations</strong> (lazy): filter, map, join — create a new RDD.</li>
+      <li><strong>Actions</strong> (trigger execution): count, collect, save.</li>
+    </ul>
+  </div>
+
+  <div class="term-card yellow">
+    <div class="term-tag">Spark Concept</div>
+    <div class="term-name">DataFrame (Spark SQL)</div>
+    <p>A higher-level abstraction over RDDs — a distributed table with named columns, like a Pandas DataFrame or a SQL table. Spark's Catalyst optimizer produces efficient query plans from DataFrame operations or SQL queries. Most modern Spark code uses DataFrames rather than raw RDDs.</p>
+  </div>
+
+  <div class="term-card purple">
+    <div class="term-tag">Spark Concept</div>
+    <div class="term-name">Lazy Evaluation &amp; DAG</div>
+    <p>Spark does <em>not</em> execute transformations immediately. It builds a Directed Acyclic Graph (DAG) of transformations. Only when an action is called does Spark optimise and execute the whole DAG in one pass — allowing operation pipelining and minimising data movement.</p>
+  </div>
+
+  <div class="term-card teal">
+    <div class="term-tag">Processing Tool</div>
+    <div class="term-name">Apache Hive</div>
+    <p>A SQL-like query layer on top of Hadoop. HiveQL (SQL dialect) queries are compiled into MapReduce or Tez/Spark jobs. Hive adds a <strong>schema-on-read</strong> meta-store (the Hive Metastore) over HDFS files. Ideal for analysts who know SQL but not Java/Python.</p>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 16 — HADOOP TOOLS
+══════════════════════════════════════ -->
+<h2 class="section-title" id="slide16"><span class="icon">🧩</span> Slide 16 — The Hadoop Ecosystem Map</h2>
+
+<div class="slide-box">
+  <span class="slide-num">SLIDE 16</span>
+  <h3>Hadoop Tools — The Full Ecosystem</h3>
+  <p>This slide shows the ecosystem of tools that grew around the Hadoop core (HDFS + YARN + MapReduce). Explain that Hadoop is not a single piece of software but a <em>platform ecosystem</em> — different tools solve different problems and all integrate with the shared HDFS storage layer.</p>
+  <p><strong>Analogy to use in lecture:</strong> <em>"HDFS is the hard drive, YARN is the operating system scheduler, and all these tools are the applications running on top."</em></p>
+
+  <div class="talking-points">
+    <h4>Category-by-Category Explanation</h4>
+  </div>
+
+  <div class="tool-grid">
+    <div class="tool-item storage">
+      <strong>HDFS &amp; Storage Layer</strong>
+      <span>HDFS is the base. HBase adds a NoSQL columnar store on top of HDFS (like Google Bigtable). Cassandra is an alternative distributed store (not on HDFS). Redis adds in-memory key-value storage for real-time lookups.</span>
+    </div>
+    <div class="tool-item process">
+      <strong>Processing Frameworks</strong>
+      <span>MapReduce = batch, disk-based. Spark = in-memory, fast, multi-purpose. Storm = real-time stream processing. Flink = true event-by-event streaming with strong exactly-once guarantees. Tez = DAG execution engine that makes Hive queries faster.</span>
+    </div>
+    <div class="tool-item sql">
+      <strong>SQL Query Engines</strong>
+      <span>Hive = SQL over MapReduce/Tez (batch). Impala = fast interactive SQL, keeps data in memory, no MapReduce overhead. Drill &amp; Tajo = distributed SQL query engines for real-time analytics. All query data stored in HDFS or HBase.</span>
+    </div>
+    <div class="tool-item ingest">
+      <strong>Data Ingestion</strong>
+      <span>Sqoop = bulk transfer between relational databases (MySQL, Oracle) and HDFS. Flume = collect and stream log/event data from many sources into HDFS. Kafka = high-throughput, fault-tolerant message bus for real-time streaming pipelines.</span>
+    </div>
+    <div class="tool-item ml">
+      <strong>Scripting &amp; Machine Learning</strong>
+      <span>Pig = scripting language (Pig Latin) that compiles to MapReduce — easier than raw Java MapReduce. Mahout = distributed machine learning library on top of Hadoop/Spark. Spark MLlib is now the preferred alternative to Mahout.</span>
+    </div>
+    <div class="tool-item coord">
+      <strong>Workflow &amp; Coordination</strong>
+      <span>Oozie = workflow scheduler for Hadoop jobs — chains MapReduce, Pig, Hive jobs with time-based or data-availability triggers. Zookeeper = distributed coordination service — provides leader election, distributed locking, configuration management. HBase, Kafka, and many Hadoop services depend on Zookeeper.</span>
+    </div>
+    <div class="tool-item mgmt">
+      <strong>Cluster Management &amp; UI</strong>
+      <span>Ambari = web-based cluster provisioning, monitoring, and management dashboard. HUE (Hadoop User Experience) = web interface for querying Hive, browsing HDFS, running Pig scripts. Zeppelin = notebook interface for interactive analytics (like Jupyter for Hadoop/Spark). Chukwa &amp; Flume = log collectors for cluster monitoring data.</span>
+    </div>
+    <div class="tool-item storage">
+      <strong>Serialization &amp; Cluster Mgmt</strong>
+      <span>Avro = data serialization system — compact binary format with schema evolution support, widely used in Hadoop pipelines. Mesos = alternative cluster resource manager (like YARN) — can run non-Hadoop workloads alongside Hadoop on the same hardware.</span>
+    </div>
+  </div>
+
+  <div class="callout tip" style="margin-top:1.2rem">
+    <strong>Exam-ready insight — Flume vs Sqoop:</strong> Students often confuse these two. <strong>Flume</strong> collects <em>streaming event/log data</em> (from web servers, sensors). <strong>Sqoop</strong> transfers <em>structured relational data</em> in bulk (from SQL databases). Both land data in HDFS, but their sources and protocols are completely different.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 17 — ENTERPRISE ARCHITECTURE
+══════════════════════════════════════ -->
+<h2 class="section-title" id="slide17"><span class="icon">🏢</span> Slide 17 — Enterprise Architecture (Data Lake)</h2>
+
+<div class="slide-box">
+  <span class="slide-num">SLIDE 17</span>
+  <h3>Enterprise Architecture — How It All Fits Together</h3>
+  <p>This diagram shows a complete enterprise data pipeline built on the Hadoop ecosystem. Walk through it left to right as a data journey — where data comes from, how it lands in HDFS, how it is processed, and where results go.</p>
+
+  <div style="margin: 1rem 0;">
+    <strong style="color:var(--srh-orange); font-size:.82rem; letter-spacing:1px; text-transform:uppercase;">The Data Flow — Left to Right</strong>
+  </div>
+
+  <div class="arch-flow">
+    <div class="arch-node" style="border-left:3px solid var(--blue)">
+      <div class="node-title">Data Sources</div>
+      <div class="node-items">Enterprise DBs<br>Log Files<br>Web Apps<br>NoSQL DBs<br>Streaming Data</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node" style="border-left:3px solid var(--green)">
+      <div class="node-title">Ingestion</div>
+      <div class="node-items">Sqoop<br>(structured)<br>Flume<br>(logs/streams)<br>Hadoop Connector</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node" style="border-left:3px solid var(--teal)">
+      <div class="node-title">Data Lake<br>(HDFS)</div>
+      <div class="node-items">Raw storage<br>All data formats<br>Cheap &amp; scalable</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node" style="border-left:3px solid var(--srh-orange)">
+      <div class="node-title">Processing</div>
+      <div class="node-items">ETL: MapReduce<br>+ Spark<br>Data Science:<br>PySpark + MLlib</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node" style="border-left:3px solid var(--yellow)">
+      <div class="node-title">Batch Query</div>
+      <div class="node-items">Hive SQL<br>Sqoop export<br>to DWH</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node" style="border-left:3px solid var(--purple)">
+      <div class="node-title">Data Warehouse<br>+ Data Marts</div>
+      <div class="node-items">Structured<br>aggregated<br>trusted data</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node" style="border-left:3px solid var(--red)">
+      <div class="node-title">Reporting</div>
+      <div class="node-items">SQL BI Tools<br>Spark SQL<br>Interactive Dashboards</div>
+    </div>
+  </div>
+
+  <div class="talking-points">
+    <h4>Layer-by-Layer Explanation for Slide 17</h4>
+    <ul>
+      <li><strong>Data Sources (left side):</strong> Enterprise transaction databases (ERP/CRM), server log files, web application events, existing NoSQL stores, and real-time social/IoT streams. This is the raw, heterogeneous data reality every enterprise faces.</li>
+      <li><strong>Ingestion — Sqoop + Flume:</strong> <em>Sqoop</em> does a bulk pull from relational databases via JDBC — typically a scheduled nightly dump. <em>Flume</em> continuously tails log files and streams events into HDFS in near-real-time. The Hadoop Connector allows NoSQL databases to write directly to HDFS.</li>
+      <li><strong>HDFS — The Data Lake:</strong> HDFS is the central repository where ALL data, regardless of format (CSV, JSON, Parquet, Avro), is stored cheaply. Key concept: data is stored first, schema is applied later (schema-on-read), unlike a Data Warehouse where schema is enforced on write.</li>
+      <li><strong>ETL Processing (MapReduce / Spark):</strong> Large-scale batch transformations — cleaning, joining, aggregating raw HDFS data. MapReduce for simple reliable batch. Spark for complex, iterative, or faster transformations.</li>
+      <li><strong>Data Science Layer (PySpark + MLlib):</strong> Machine learning, statistical analysis, and feature engineering directly on the raw data in HDFS, using Spark's distributed in-memory processing. Data scientists access this layer via notebooks (Zeppelin, Jupyter + PySpark).</li>
+      <li><strong>Hive for Batch Queries:</strong> Analysts write HiveQL (SQL) against HDFS data without needing to know Java. Hive compiles SQL into cluster jobs. Results can be exported back to the DWH via Sqoop.</li>
+      <li><strong>DWH + Data Marts:</strong> The cleaned, aggregated, trusted data moves into a Data Warehouse (or cloud equivalent like Redshift, Synapse). Data Marts are subject-specific subsets for each department — Sales Mart, Finance Mart, etc.</li>
+      <li><strong>Interactive Reporting:</strong> Business users access the DWH through standard SQL BI tools. Data scientists can query the entire HDFS lake directly with SparkSQL for ad-hoc analysis, bypassing the DWH for exploratory work.</li>
+    </ul>
+  </div>
+
+  <div class="callout info" style="margin-top:1rem">
+    <strong>Key Teaching Point — Data Lake vs Data Warehouse:</strong> The Data Lake (HDFS) accepts <em>all</em> data formats without upfront transformation. The Data Warehouse only accepts structured, schema-conformant data. The lake enables retrospective analysis — you can apply a new schema to old raw data at any time. The DWH is optimised for fast, predictable business queries.
+  </div>
+
+  <div class="callout warn" style="margin-top:.8rem">
+    <strong>Common Student Question:</strong> "Why do we need both MapReduce/Spark AND a DWH?" — Answer: The Data Lake (HDFS) stores everything cheap and raw for data engineers and scientists. The DWH stores only the refined, business-ready subset, optimised for fast BI queries by business analysts. They serve different consumers and different query patterns.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION — MAPREDUCE vs SPARK
+══════════════════════════════════════ -->
+<h2 class="section-title" id="comparison"><span class="icon">⚖️</span> MapReduce vs Spark — Deep Comparison</h2>
+
+<div class="callout info" style="margin-bottom:1rem">
+  <strong>The Core Difference in One Sentence:</strong> MapReduce writes intermediate results to disk after every map/reduce phase. Spark keeps intermediate results in memory (RAM). This one architectural decision explains almost all the differences in the table below.
+</div>
+
+<div class="compare-wrapper">
+<table class="compare">
+  <thead>
+    <tr>
+      <th style="width:18%">Dimension</th>
+      <th style="width:41%">Hadoop MapReduce</th>
+      <th style="width:41%">Apache Spark</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Processing Model</strong></td>
+      <td>Disk-based batch. Every stage reads from and writes to HDFS.</td>
+      <td>In-memory. Data persists in RAM between stages as RDDs/DataFrames.</td>
+    </tr>
+    <tr>
+      <td><strong>Speed</strong></td>
+      <td class="lose">Slow for iterative tasks. Each iteration = a full disk read/write cycle.</td>
+      <td class="win">100× faster in-memory, 10× faster on disk. Can sort 100 TB in 3× less time using 10× fewer machines.</td>
+    </tr>
+    <tr>
+      <td><strong>Reliability</strong></td>
+      <td class="win">High. Disk writes after every phase = natural checkpoints. If a node fails, resume from last disk write. Mature battle-tested codebase.</td>
+      <td class="lose">Lower. If a node fails, Spark replays the RDD lineage from the last checkpoint. With many in-memory stages, this can be expensive. Memory pressure causes spills to disk.</td>
+    </tr>
+    <tr>
+      <td><strong>Memory Usage</strong></td>
+      <td class="win">Low. Uses disk I/O, not RAM. Works well on commodity machines with modest RAM. Minimal memory configuration needed.</td>
+      <td class="lose">High. Needs large RAM allocations per executor. If running alongside other YARN services, memory pressure can cause RAM overhead and memory leaks.</td>
+    </tr>
+    <tr>
+      <td><strong>Cost</strong></td>
+      <td class="win">Cheaper hardware. Disk is far cheaper than RAM. Ideal for large volumes of cold historical data.</td>
+      <td class="lose">More expensive hardware if large RAM is needed. However, fewer machines are required for the same job — so TCO can be lower for speed-sensitive workloads.</td>
+    </tr>
+    <tr>
+      <td><strong>Use Cases</strong></td>
+      <td>Large-scale batch ETL on stable historical data, simple counting/aggregation over petabytes.</td>
+      <td class="win">Iterative ML algorithms, interactive analytics, streaming, complex multi-stage transformations, data science notebooks.</td>
+    </tr>
+    <tr>
+      <td><strong>Ease of Use</strong></td>
+      <td class="lose">Java-only historically. Very verbose code (a word count = 50+ lines). No interactive mode. Pig/Hive improve this but add complexity.</td>
+      <td class="win">Python (PySpark), Scala, Java, R. Concise APIs. Interactive shell. Built-in support for SQL, ML, streaming, and graph processing in one engine.</td>
+    </tr>
+    <tr>
+      <td><strong>Security</strong></td>
+      <td class="win">Mature. Kerberos authentication, HDFS ACLs, YARN queue-level authorization, Hadoop Encryption, Knox Gateway, Sentry — full enterprise security stack.</td>
+      <td class="lose">Evolving. Relies mainly on shared-secret (password) authentication. When integrated into Hadoop, it inherits Hadoop's security features, but standalone Spark security is limited.</td>
+    </tr>
+    <tr>
+      <td><strong>Streaming</strong></td>
+      <td class="lose">No native streaming. External tools (Storm, Kafka) are required.</td>
+      <td class="win">Spark Streaming (micro-batch) and Structured Streaming (event-time, exactly-once) — native streaming without additional tools.</td>
+    </tr>
+    <tr>
+      <td><strong>Batch Processing</strong></td>
+      <td class="win">Highly efficient for large-scale simple batch. No RAM pressure, stable under heavy load on YARN.</td>
+      <td class="dim">Good for batch, but MapReduce is more efficient for simple one-pass batch jobs over very large datasets where in-memory caching provides no benefit.</td>
+    </tr>
+    <tr>
+      <td><strong>Ecosystem</strong></td>
+      <td>Native Hadoop citizen. HDFS, YARN, Hive, all built around it.</td>
+      <td class="win">Runs on YARN (using HDFS), Kubernetes, or standalone. Integrates with Hive Metastore via SparkSQL. Can <em>replace</em> MapReduce in existing Hadoop deployments.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="verdict-row">
+  <div class="verdict-card mapred">
+    <h4>Choose MapReduce When…</h4>
+    <ul>
+      <li>Processing massive historical datasets in a single pass</li>
+      <li>Reliability and durability are paramount (financial processing)</li>
+      <li>Cluster RAM is limited or shared with many services</li>
+      <li>Simple ETL jobs with no iterative computation</li>
+      <li>Enterprise security requirements are strict</li>
+      <li>Cost-per-TB matters more than speed</li>
+    </ul>
+  </div>
+  <div class="verdict-card spark">
+    <h4>Choose Spark When…</h4>
+    <ul>
+      <li>Iterative machine learning algorithms (gradient descent, etc.)</li>
+      <li>Interactive data exploration / notebook analysis</li>
+      <li>Real-time or near-real-time streaming pipelines</li>
+      <li>Complex multi-stage transformations with intermediate reuse</li>
+      <li>Speed is critical (sub-minute query turnaround)</li>
+      <li>Multi-language team (Python scientists + Scala engineers)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout tip" style="margin-top:1.2rem">
+  <strong>The Modern Reality:</strong> In most production clusters today, Spark has largely replaced MapReduce for <em>new development</em>. However, legacy MapReduce jobs still run reliably in production pipelines. The two are not competitors — Spark can run <em>on top of Hadoop</em> (YARN + HDFS), combining Hadoop's reliable storage with Spark's fast processing. Apache Hive 3.x even uses Tez or Spark as its execution backend instead of MapReduce.
+</div>
+
+<!-- ══════════════════════════════════════
+     QUICK GLOSSARY
+══════════════════════════════════════ -->
+<h2 class="section-title" id="datalake-dwh"><span class="icon">🌊</span> Data Lake vs Data Warehouse</h2>
+
+<div class="dl-dwh-grid">
+
+  <!-- DATA LAKE -->
+  <div class="dl-panel lake">
+    <h3>Data Lake</h3>
+    <div class="dl-tagline">"Store everything first. Ask questions later."</div>
+    <p>A centralised repository that stores <strong>raw data at any scale</strong> — structured, semi-structured, and unstructured — in its native format, without upfront schema enforcement. Schema is applied at <em>read time</em>, not write time.</p>
+    <div class="dl-prop" style="margin:.8rem 0; border-left:3px solid var(--teal); padding:.5rem .8rem; background:rgba(255,255,255,.6); border-radius:6px; font-size:.84rem;">
+      <strong style="color:var(--teal); margin-right:.5rem;">Hadoop link:</strong>
+      <span style="color:#333;">HDFS <em>is</em> the Data Lake — it is the raw, schema-less storage tier at the centre of every Hadoop deployment, ingesting data from all sources via Sqoop and Flume.</span>
+    </div>
+    <div style="margin-top:.8rem;">
+      <div style="font-size:.7rem; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:.5rem;">Industry Examples</div>
+      <div class="example-cards" style="grid-template-columns:1fr 1fr; gap:.5rem;">
+        <div class="example-card"><div class="ex-company"><span class="ex-logo">🟠</span> Amazon S3</div><div class="ex-product">AWS Lake Formation</div><div class="ex-desc">Most widely used Data Lake — Netflix, Airbnb, and thousands of enterprises store petabytes of raw data here.</div></div>
+        <div class="example-card"><div class="ex-company"><span class="ex-logo">🔵</span> Azure ADLS</div><div class="ex-product">Gen2 — Hadoop-compatible</div><div class="ex-desc">Microsoft's Hadoop-compatible object store. Stores IoT telemetry, logs, and raw enterprise data at scale.</div></div>
+        <div class="example-card"><div class="ex-company"><span class="ex-logo">🟡</span> Google GCS</div><div class="ex-product">+ Cloud Dataproc</div><div class="ex-desc">Spotify stores billions of raw listening events here and runs Spark on Dataproc for ML model training.</div></div>
+        <div class="example-card"><div class="ex-company"><span class="ex-logo">🔴</span> Databricks</div><div class="ex-product">Delta Lake (open-source)</div><div class="ex-desc">Adds ACID transactions to a standard Data Lake, preventing it from becoming a "data swamp." Used by Comcast and Verizon.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA WAREHOUSE -->
+  <div class="dl-panel dwh">
+    <h3>Data Warehouse</h3>
+    <div class="dl-tagline">"Curated, trusted, ready to report."</div>
+    <p>A database optimised for <strong>analytical queries</strong> on structured, historical data. Data is cleaned, transformed, and loaded (ETL) into a fixed schema before entering the warehouse. Delivers fast, consistent answers to known business questions.</p>
+    <div class="dl-prop" style="margin:.8rem 0; border-left:3px solid var(--blue); padding:.5rem .8rem; background:rgba(255,255,255,.6); border-radius:6px; font-size:.84rem;">
+      <strong style="color:var(--blue); margin-right:.5rem;">Hadoop link:</strong>
+      <span style="color:#333;">The DWH sits <em>downstream</em> of Hadoop — MapReduce/Spark refines raw HDFS data, Hive queries it, and Sqoop exports the clean aggregated results into the DWH for BI reporting.</span>
+    </div>
+    <div style="margin-top:.8rem;">
+      <div style="font-size:.7rem; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:.5rem;">Industry Examples</div>
+      <div class="example-cards" style="grid-template-columns:1fr 1fr; gap:.5rem;">
+        <div class="example-card"><div class="ex-company"><span class="ex-logo">❄️</span> Snowflake</div><div class="ex-product">Cloud-native DWH</div><div class="ex-desc">Separates storage and compute. Used by DoorDash, Capital One, and Adobe for governed BI reporting.</div></div>
+        <div class="example-card"><div class="ex-company"><span class="ex-logo">🔴</span> Amazon Redshift</div><div class="ex-product">AWS columnar DWH</div><div class="ex-desc">Data flows from S3 (lake) into Redshift for structured reporting. Used by Nasdaq, McDonald's, and Lyft.</div></div>
+        <div class="example-card"><div class="ex-company"><span class="ex-logo">🟡</span> Google BigQuery</div><div class="ex-product">Serverless DWH</div><div class="ex-desc">Sub-second queries over billions of rows. Used by Spotify, Twitter/X, and The New York Times for dashboards.</div></div>
+        <div class="example-card"><div class="ex-company"><span class="ex-logo">🏦</span> Teradata</div><div class="ex-product">On-premises MPP DWH</div><div class="ex-desc">Classic enterprise DWH at Citibank, Deutsche Bank, Walmart. Receives clean data from Hadoop via Sqoop.</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="callout tip" style="margin-top:1rem">
+  <strong>The bigger picture:</strong> In a Hadoop enterprise pipeline, HDFS is the Data Lake (everything lands here raw and cheap) and the DWH sits at the end of the pipeline (only the clean, aggregated, business-ready data). They are not alternatives — they are partners at opposite ends of the data value chain.
+</div>
+
+<h2 class="section-title" id="glossary"><span class="icon">📖</span> Quick Glossary — Lecture-Ready Definitions</h2>
+
+<div class="term-grid">
+
+  <div class="term-card">
+    <div class="term-name">ETL</div>
+    <p><strong>Extract, Transform, Load</strong> — the process of pulling data from source systems, cleaning/reformatting it, and loading it into a target system (HDFS, DWH). MapReduce and Spark are the ETL engines in a Hadoop pipeline.</p>
+  </div>
+
+  <div class="term-card green">
+    <div class="term-name">Data Lake</div>
+    <p>A centralised repository storing raw data at any scale in its native format, without upfront schema enforcement. Applies schema at <em>read time</em>. HDFS is the original Data Lake technology. See the full <a href="#datalake-dwh" style="color:var(--teal);">Data Lake vs DWH section</a> for definitions, properties, and industry examples.</p>
+  </div>
+
+  <div class="term-card blue">
+    <div class="term-name">Data Warehouse (DWH)</div>
+    <p>A database optimised for structured analytical queries on cleaned, historical data. Enforces schema at <em>write time</em>. Examples: Snowflake, Amazon Redshift, Google BigQuery, Azure Synapse. See the full <a href="#datalake-dwh" style="color:var(--blue);">Data Lake vs DWH section</a> for a detailed comparison and industry examples.</p>
+  </div>
+
+  <div class="term-card teal">
+    <div class="term-name">Schema-on-Read vs Schema-on-Write</div>
+    <p><strong>Schema-on-Write (DWH):</strong> Data must conform to a schema before being written — inflexible but fast to query. <strong>Schema-on-Read (Data Lake):</strong> Raw data stored as-is; schema applied when queried — flexible, enables retroactive analysis, but requires more careful query planning.</p>
+  </div>
+
+  <div class="term-card yellow">
+    <div class="term-name">PySpark</div>
+    <p>The Python API for Apache Spark. Allows data scientists to write Spark jobs using Python instead of Scala/Java. Under the hood, PySpark calls the same JVM-based Spark engine via Py4J.</p>
+  </div>
+
+  <div class="term-card purple">
+    <div class="term-name">MLlib</div>
+    <p>Spark's built-in distributed machine learning library. Includes algorithms for classification, regression, clustering, collaborative filtering, and dimensionality reduction — all implemented to run in parallel across the cluster.</p>
+  </div>
+
+  <div class="term-card teal">
+    <div class="term-name">Sqoop</div>
+    <p>Apache Sqoop (SQL-to-Hadoop) is a tool for bulk data transfer between HDFS and relational databases (MySQL, Oracle, SQL Server). Uses parallel JDBC connections for high throughput. Direction: DB → HDFS (import) or HDFS → DB (export).</p>
+  </div>
+
+  <div class="term-card">
+    <div class="term-name">Apache Flume</div>
+    <p>A distributed, reliable service for collecting, aggregating, and moving large volumes of log data (or any event data) from many sources into HDFS. Sources include web server logs, syslog, and custom application events.</p>
+  </div>
+
+  <div class="term-card green">
+    <div class="term-name">Apache Kafka</div>
+    <p>A high-throughput, durable, distributed message queue / event streaming platform. Producers write events to topics; consumers read from topics. Kafka is the real-time nervous system connecting data sources to Hadoop or Spark streaming pipelines.</p>
+  </div>
+
+  <div class="term-card red">
+    <div class="term-name">HBase</div>
+    <p>A NoSQL, wide-column store built on top of HDFS, modelled on Google Bigtable. Provides random, real-time read/write access to HDFS data — something HDFS alone cannot do. Ideal for key-based lookups at millisecond latency.</p>
+  </div>
+
+  <div class="term-card blue">
+    <div class="term-name">Zookeeper</div>
+    <p>Distributed coordination service — provides reliable primitives like configuration management, distributed locking, leader election, and naming. HBase, Kafka, YARN HA, and many Hadoop services depend on Zookeeper for cluster-wide coordination.</p>
+  </div>
+
+  <div class="term-card yellow">
+    <div class="term-name">Apache Oozie</div>
+    <p>A workflow scheduler for Hadoop jobs. Coordinates multi-step pipelines (ingest → transform → load) using time-based schedules or data-availability triggers. Supports MapReduce, Pig, Hive, and shell action types.</p>
+  </div>
+
+  <div class="term-card purple">
+    <div class="term-name">Data Mart</div>
+    <p>A subject-specific subset of a Data Warehouse containing data relevant to a single business unit (Sales, Finance, HR). Data is pre-aggregated and optimised for fast BI queries by that team. Data Marts are fed from the DWH.</p>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     HANDS-ON LAB
+══════════════════════════════════════ -->
+<h2 class="section-title" id="hands-on-lab"><span class="icon">🧪</span> Hands-On Lab</h2>
+
+<div class="callout info">
+  <strong>Source Repository</strong>
+  <p>All files needed for this lab are in the <strong>spark-cluster</strong> folder of the course repository:<br>
+  <a href="https://github.com/binhvd/Data-Engineer-1" target="_blank" style="color:var(--blue);font-weight:600;">github.com/binhvd/Data-Engineer-1</a></p>
+</div>
+
+<p style="font-size:.9rem;color:#444;margin:.8rem 0 1rem;">Deploy a local Hadoop cluster as Docker containers using a single compose file. The cluster includes all core components:</p>
+
+<ul style="font-size:.88rem;color:#444;line-height:2;padding-left:1.4rem;margin-bottom:1.2rem;">
+  <li><strong>NameNode</strong> — manages HDFS filesystem metadata</li>
+  <li><strong>DataNode</strong> — stores the actual HDFS data blocks</li>
+  <li><strong>ResourceManager</strong> — allocates cluster resources (YARN)</li>
+  <li><strong>NodeManager</strong> — manages containers on the worker node (YARN)</li>
+  <li><strong>History Server</strong> — records logs of completed jobs</li>
+</ul>
+
+<div class="step-row">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <div class="step-title">Clone the repository and navigate to the spark-cluster folder</div>
+    <div class="step-desc">If you already cloned it, skip the clone step and just navigate.</div>
+    <div class="cmd-block">
+      <span class="cm"># Clone the course repository</span><br>
+      git clone https://github.com/binhvd/Data-Engineer-1<br><br>
+      <span class="cm"># Navigate to the Hadoop cluster folder</span><br>
+      cd Data-Engineer-1/spark-cluster
+    </div>
+  </div>
+</div>
+
+<div class="step-row">
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <div class="step-title">Deploy the cluster</div>
+    <div class="step-desc">Pulls all images and starts all 5 containers in the background.</div>
+    <div class="cmd-block">
+      sudo docker-compose up -d
+    </div>
+  </div>
+</div>
+
+<div class="step-row">
+  <div class="step-num">3</div>
+  <div class="step-body">
+    <div class="step-title">Wait ~2 minutes, then explore the HDFS UI</div>
+    <div class="step-desc">Open your browser and go to the NameNode web interface. Replace <code style="background:var(--surface2);padding:0 .3rem;border-radius:3px;">[Ubuntu IP]</code> with your VM's IP address.</div>
+    <div class="cmd-block">
+      <span class="cm"># Find your Ubuntu VM IP if needed</span><br>
+      hostname -I<br><br>
+      <span class="cm"># Open in browser</span><br>
+      http://[Ubuntu IP]:9870
+    </div>
+    <div class="callout tip" style="margin-top:.5rem;">
+      <strong>What to explore</strong>
+      <p>In the HDFS UI you can see: cluster summary (live/dead DataNodes), filesystem browser, block report, and NameNode logs. Navigate to <strong>Datanodes</strong> to confirm the DataNode is registered and <strong>Utilities → Browse the file system</strong> to explore HDFS.</p>
+    </div>
+  </div>
+</div>
+
+<div class="step-row">
+  <div class="step-num">4</div>
+  <div class="step-body">
+    <div class="step-title">Stop and remove all containers</div>
+    <div class="step-desc">The <code style="background:var(--surface2);padding:0 .3rem;border-radius:3px;">-v</code> flag also removes the named volumes, giving you a clean slate for the next run.</div>
+    <div class="cmd-block">
+      sudo docker-compose down -v
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<footer>
+  SRH Hochschule Heidelberg &nbsp;·&nbsp; Data Engineering 1 &nbsp;·&nbsp; Hadoop Ecosystem Lecture Guide &nbsp;·&nbsp; Prof. Dr.-Ing. Binh Vu
+</footer>
+
+<script>
+  // ── DIAGRAM 1: Hadoop Architecture ──────────────────────────────
+  const ALL_LAYERS = ['ha-yarn','ha-hdfs','ha-nodes'];
+  const ALL_PULSES = ['ha-p1','ha-p2','ha-p3'];
+
+  function haHighlight(appKey, appName) {
+    haReset();
+    document.querySelectorAll('.ha-app.ha-clickable').forEach(el => {
+      if (el.getAttribute('onclick').includes(`'${appKey}'`)) el.classList.add('ha-active');
+    });
+    const delays = [0, 450, 900];
+    ALL_LAYERS.forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('ha-active');
+        const p = document.getElementById(ALL_PULSES[i]);
+        if (p) p.classList.add('running');
+      }, delays[i]);
+    });
+    document.getElementById('ha-hint').textContent =
+      `${appName} → requests resources from YARN → YARN schedules tasks on HDFS nodes → reads/writes local disks`;
+  }
+
+  function haPlayAll() {
+    haReset();
+    const apps = document.querySelectorAll('.ha-app.ha-clickable');
+    let i = 0;
+    function tick() {
+      if (i > 0) apps[i-1].classList.remove('ha-active');
+      if (i < apps.length) { apps[i].classList.add('ha-active'); i++; setTimeout(tick, 550); }
+    }
+    tick();
+    [0, 450, 900].forEach((d, j) => {
+      setTimeout(() => {
+        document.getElementById(ALL_LAYERS[j])?.classList.add('ha-active');
+        document.getElementById(ALL_PULSES[j])?.classList.add('running');
+      }, d);
+    });
+    document.getElementById('ha-hint').textContent =
+      'All frameworks share the same YARN + HDFS — that is the key architecture insight';
+  }
+
+  function haReset() {
+    document.querySelectorAll('.ha-app.ha-clickable').forEach(el => el.classList.remove('ha-active'));
+    ALL_LAYERS.forEach(id => document.getElementById(id)?.classList.remove('ha-active'));
+    ALL_PULSES.forEach(id => document.getElementById(id)?.classList.remove('running'));
+    document.getElementById('ha-hint').textContent = 'Click an app above to trace its path through the stack';
+  }
+
+  // ── DIAGRAM 2: Cluster Architecture ─────────────────────────────
+  let clTimer = null;
+
+  const WRITE_SEQ = [
+    { ids:['cl-master2','cl-nn'],           chips:['cl-nn'],           msg:'① Client contacts NameNode for a write — NameNode checks permissions and allocates block locations (metadata only, no data moves here).' },
+    { ids:['cl-wA'],                         chips:['cl-dnA','cl-blkA'], msg:'② Client streams data to DataNode A (primary replica). NameNode instructed to place block here.' },
+    { ids:['cl-wA','cl-wB'],                 chips:['cl-dnA','cl-dnB','cl-blkA','cl-blkB'], msg:'③ DataNode A replicates the block to DataNode B (second replica, same rack or different rack).' },
+    { ids:['cl-wA','cl-wB','cl-wC'],         chips:['cl-dnA','cl-dnB','cl-dnC','cl-blkA','cl-blkB','cl-blkC'], msg:'④ DataNode B replicates to DataNode C (third replica, ideally on a different rack — rack awareness). Replication factor 3 achieved.' }
+  ];
+
+  const READ_SEQ = [
+    { ids:['cl-master2','cl-nn'],     chips:['cl-nn'],     msg:'① Client asks NameNode: "where are the blocks for file X?" — NameNode returns a block map, e.g. Block 1 → [Node A, B, C] · Block 2 → [Node B, C, A]. No data moves yet.' },
+    { ids:['cl-wA'],                   chips:['cl-dnA'],    msg:'② Client reads Block 1 directly from DataNode A — the nearest replica. Nodes B and C hold the SAME block as backup replicas but are NOT contacted. One replica per block is all that is needed.' },
+    { ids:['cl-wB'],                   chips:['cl-dnB'],    msg:'③ Client reads Block 2 from DataNode B — this is a DIFFERENT block of the same file, whose nearest copy is on Node B. Large files span many blocks across many nodes, so multiple DataNodes are visited — but only one per block, never all three replicas.' },
+    { ids:['cl-wA'],                   chips:['cl-dnA'],    msg:'④ Fault tolerance: if DataNode B had been unavailable during step ③, the client would automatically retry Block 2 on Node C (the next replica in the list) — with no involvement from the application. The replicas on B and C exist for redundancy, not parallel reading.' }
+  ];
+
+  function clusterPath(type) {
+    clusterReset();
+    if (type === 'hb') { showHeartbeat(); return; }
+    const seq = type === 'write' ? WRITE_SEQ : READ_SEQ;
+    document.getElementById('cl-hint').textContent =
+      type === 'write' ? 'HDFS Write: Client → NameNode → DataNode replication chain' : 'HDFS Read: Client → NameNode metadata → DataNode data stream';
+    let step = 0;
+    function next() {
+      if (step > 0) { clusterReset(true); }
+      if (step >= seq.length) return;
+      const s = seq[step++];
+      s.ids.forEach(id => document.getElementById(id)?.classList.add('path-on'));
+      s.chips.forEach(id => document.getElementById(id)?.classList.add('path-on'));
+      document.getElementById('cl-hint').textContent = s.msg;
+      clTimer = setTimeout(next, 2000);
+    }
+    next();
+  }
+
+  function showHeartbeat() {
+    document.getElementById('cl-hint').textContent =
+      '💓 DataNodes and NodeManagers send heartbeats to master nodes every 3 s — NameNode uses this to detect failures';
+    ['cl-dnA','cl-dnB','cl-dnC'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el) {
+        const dot = document.createElement('span');
+        dot.className = `hb-dot d${i}`;
+        dot.dataset.hb = '1';
+        el.appendChild(dot);
+        el.classList.add('path-on');
+      }
+    });
+    ['cl-nmA','cl-nmB','cl-nmC'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el) {
+        const dot = document.createElement('span');
+        dot.className = `hb-dot d${i}`;
+        dot.dataset.hb = '1';
+        el.appendChild(dot);
+      }
+    });
+    document.getElementById('cl-master2')?.classList.add('path-on');
+    document.getElementById('cl-nn')?.classList.add('path-on');
+  }
+
+  function clusterReset(soft) {
+    if (!soft) {
+      clearTimeout(clTimer);
+      document.getElementById('cl-hint').textContent = 'Select a path to animate';
+    }
+    document.querySelectorAll('.cnode.path-on').forEach(el => el.classList.remove('path-on'));
+    document.querySelectorAll('.service-chip.path-on').forEach(el => el.classList.remove('path-on'));
+    document.querySelectorAll('[data-hb]').forEach(el => el.remove());
+  }
+
+  // ── DIAGRAM 3: YARN Step Walkthrough ─────────────────────────────
+  const ALL_ELS = ['yc-c1','yc-c2','yc-rm','yc-nm1','yc-nm2','yc-nm3','yc-am1','yc-am2','yc-con1a','yc-con1b','yc-con2a','yc-con3a','yc-con3b','yc-con3c'];
+
+  const YARN_STEPS = [
+    {
+      label:'Step 1 of 7 — Job Submission',
+      text:'<strong>Client</strong> submits a job application to the <strong>ResourceManager</strong>. The RM is the single point of entry — it tracks all cluster resources and queues incoming jobs.',
+      active:['yc-c1','yc-c2','yc-rm'],
+      dim:['yc-nm1','yc-nm2','yc-nm3','yc-am1','yc-am2','yc-con1a','yc-con1b','yc-con2a','yc-con3a','yc-con3b','yc-con3c']
+    },
+    {
+      label:'Step 2 of 7 — Launch ApplicationMaster',
+      text:'<strong>ResourceManager</strong> picks a free NodeManager and launches an <strong>ApplicationMaster</strong> container there. Each submitted job gets its own AppMaster for independent lifecycle management.',
+      active:['yc-rm','yc-nm1','yc-am1'],
+      dim:['yc-c1','yc-c2','yc-nm2','yc-nm3','yc-am2','yc-con1a','yc-con1b','yc-con2a','yc-con3a','yc-con3b','yc-con3c']
+    },
+    {
+      label:'Step 3 of 7 — Resource Negotiation',
+      text:'<strong>ApplicationMaster</strong> negotiates with the <strong>ResourceManager</strong> for containers — specifying required CPU, RAM, and preferred host locations (ideally nodes holding the HDFS blocks it needs to read).',
+      active:['yc-am1','yc-rm'],
+      dim:['yc-c1','yc-c2','yc-nm2','yc-nm3','yc-am2','yc-con1a','yc-con1b','yc-con2a','yc-con3a','yc-con3b','yc-con3c','yc-nm1']
+    },
+    {
+      label:'Step 4 of 7 — Container Grants (Data Locality)',
+      text:'<strong>ResourceManager</strong> grants containers on NodeManagers — preferring nodes that physically hold the required HDFS data blocks. This <em>data locality</em> avoids sending terabytes across the network.',
+      active:['yc-rm','yc-nm1','yc-nm2','yc-nm3'],
+      dim:['yc-c1','yc-c2','yc-am1','yc-am2','yc-con1a','yc-con1b','yc-con2a','yc-con3a','yc-con3b','yc-con3c']
+    },
+    {
+      label:'Step 5 of 7 — Task Execution',
+      text:'<strong>NodeManagers</strong> launch the granted containers and execute the actual tasks (map, shuffle, or reduce). Each container is an isolated CPU+RAM slice — tasks run in parallel across all three workers.',
+      active:['yc-nm1','yc-nm2','yc-nm3','yc-con1a','yc-con1b','yc-con2a','yc-con3a','yc-con3b','yc-con3c'],
+      dim:['yc-c1','yc-c2','yc-rm','yc-am1','yc-am2']
+    },
+    {
+      label:'Step 6 of 7 — Monitoring &amp; Fault Recovery',
+      text:'<strong>ApplicationMaster</strong> polls all containers for progress. If a container fails (node crash, OOM), the AppMaster requests a replacement container from the RM and retries the task — transparent to the user.',
+      active:['yc-am1','yc-am2','yc-con1a','yc-con1b','yc-con2a','yc-con3a','yc-con3b','yc-con3c'],
+      dim:['yc-c1','yc-c2','yc-rm','yc-nm1','yc-nm2','yc-nm3']
+    },
+    {
+      label:'Step 7 of 7 — Job Completion',
+      text:'All tasks done. <strong>ApplicationMaster</strong> reports success to the <strong>ResourceManager</strong> and exits. YARN reclaims all containers. The cluster is free for the next job. The client receives the final result.',
+      active:['yc-am1','yc-rm','yc-c1'],
+      dim:['yc-c2','yc-nm1','yc-nm2','yc-nm3','yc-am2','yc-con1a','yc-con1b','yc-con2a','yc-con3a','yc-con3b','yc-con3c']
+    }
+  ];
+
+  let yStep = 0;
+  let yAutoTimer = null;
+  let yAutoRunning = false;
+
+  function yarnApply(step) {
+    ALL_ELS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.remove('ys-active','ys-dim'); }
+    });
+    if (step < 0 || step >= YARN_STEPS.length) return;
+    const s = YARN_STEPS[step];
+    s.active.forEach(id => document.getElementById(id)?.classList.add('ys-active'));
+    s.dim.forEach(id => document.getElementById(id)?.classList.add('ys-dim'));
+    document.getElementById('yarn-info-label').textContent = s.label;
+    document.getElementById('yarn-info-text').innerHTML = s.text;
+
+    for (let i = 0; i < 7; i++) {
+      const p = document.getElementById(`yp${i}`);
+      if (!p) continue;
+      p.classList.remove('done','active');
+      if (i < step) p.classList.add('done');
+      else if (i === step) p.classList.add('active');
+    }
+    document.getElementById('yarn-counter').textContent = `Step ${step+1} / 7`;
+    document.getElementById('yarn-prev').disabled = step === 0;
+    document.getElementById('yarn-next').disabled = step === YARN_STEPS.length - 1;
+  }
+
+  function yarnNav(dir) {
+    yarnStopAuto();
+    yStep = Math.max(0, Math.min(YARN_STEPS.length - 1, yStep + dir));
+    yarnApply(yStep);
+  }
+
+  function yarnAuto() {
+    if (yAutoRunning) { yarnStopAuto(); return; }
+    yAutoRunning = true;
+    document.getElementById('yarn-auto').textContent = '⏸ Pause';
+    if (yStep >= YARN_STEPS.length - 1) { yStep = 0; }
+    function tick() {
+      yarnApply(yStep);
+      if (yStep < YARN_STEPS.length - 1) {
+        yStep++;
+        yAutoTimer = setTimeout(tick, 2200);
+      } else {
+        yarnStopAuto();
+      }
+    }
+    tick();
+  }
+
+  function yarnStopAuto() {
+    clearTimeout(yAutoTimer);
+    yAutoRunning = false;
+    document.getElementById('yarn-auto').textContent = '⏵ Auto Play';
+  }
+
+  function yarnReset() {
+    yarnStopAuto();
+    yStep = 0;
+    ALL_ELS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('ys-active','ys-dim');
+    });
+    for (let i = 0; i < 7; i++) {
+      const p = document.getElementById(`yp${i}`);
+      if (p) p.classList.remove('done','active');
+    }
+    document.getElementById('yarn-info-label').textContent = 'Ready';
+    document.getElementById('yarn-info-text').innerHTML = 'Click <strong>Next Step</strong> or <strong>Auto Play</strong> to walk through YARN\'s job execution flow — 7 steps in total.';
+    document.getElementById('yarn-counter').textContent = 'Step 0 / 7';
+    document.getElementById('yarn-prev').disabled = true;
+    document.getElementById('yarn-next').disabled = false;
+  }
+
+  const sections = document.querySelectorAll('h2.section-title');
+  const navLinks = document.querySelectorAll('nav.sidebar a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`nav.sidebar a[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
